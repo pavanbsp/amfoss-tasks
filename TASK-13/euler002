@@ -1,0 +1,13 @@
+n=int(input())
+for l in range (n):
+    x=int(input())
+    a=0
+    b=2
+    c=0 
+    d=0
+    while d<x:
+        a+=b
+        d=4*b+c
+        c=b
+        b=d
+    print(a)
