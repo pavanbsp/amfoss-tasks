@@ -1,0 +1,10 @@
+n=int(input())
+for i in range(n):
+    x=input()
+    if len(x)>10:
+        y=len(x)
+        print(x[0],end="")
+        print(y-2,end="")
+        print(x[y-1])
+    else:
+        print(x)
