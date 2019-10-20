@@ -1,0 +1,13 @@
+B=[]
+for i in range(100, 1000):
+    for j in range(100, 1000):
+        a = i * j
+        B.append(a)
+n=int(input())
+for i in range(n):
+    a=int(input())
+    A=[]
+    for j in range(100,a):
+        if str(j)==str(j)[::-1] and j in B:
+            A.append(j)
+    print(max(A))
