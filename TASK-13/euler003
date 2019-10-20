@@ -1,0 +1,15 @@
+def prime(n):
+    t=True
+    for i in range(2,n):
+        if n%i==0:
+            t=False
+    return t
+n=int(input())
+for i in range(n):
+    x=int(input())
+    a=[]
+    for j in range(2,x+1):
+        if x%j==0:
+            if prime(j):
+                a.append(j)
+    print(max(a))
