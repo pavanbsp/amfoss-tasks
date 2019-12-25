@@ -1,0 +1,1 @@
+This ruby code helps you to find top 10 google searches for a word in terminal

@@ -1,0 +1,1 @@
+I have gone through these [pdfs](https://drive.google.com/drive/folders/0B_VIn9iHJACxYnhhUGtNSGlfMEE?usp=sharing) and understood that i should modify the code,so i modified the code given in xor_adv.py

@@ -1,0 +1,1 @@
+This rust program verifies the email and certifies whether that is valid or not
