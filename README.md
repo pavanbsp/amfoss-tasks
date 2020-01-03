@@ -1,3 +1,6 @@
+This table shows the status of the tasks done by me which were given by amfoss inorder to join foss club
+
+
 |  Task no:   |  Task Name   | Status                    |
 |:-----------:|:------------:|:--------------------------:|
 |   0         | [Installing ubuntu](https://github.com/pavanbsp/amfoss-tasks/tree/master/TASK-0)| Installation completed by following instructions|
@@ -5,8 +8,8 @@
 |   2         | [Programming](https://github.com/pavanbsp/amfoss-tasks/tree/master/TASK-2)  | solved all hackerrank and codeforces problems in python|
 |   3         | [Google Scraping using Ruby](https://github.com/pavanbsp/amfoss-tasks/tree/master/TASK-3) | Wrote a program in ruby using nokogiri gem|
 |   4         | [Advanced XOR](https://github.com/pavanbsp/amfoss-tasks/tree/master/TASK-4)| Made a python script and got the flag|
-|   5         | Get it using Javascript  |                     |
-|   6         | CLI App using Go |     |
+|   5         | Get it using Javascript  | Didn't know much about html and js    |
+|   6         | CLI App using Go | Learning Go syntax    |
 |   7         | [Rusted Email](https://github.com/pavanbsp/amfoss-tasks/tree/master/TASK-7) | Learned basic rust syntax and wrote a program|
 |   8         | [Captcha Breaking](https://github.com/pavanbsp/amfoss-tasks/tree/master/TASK-8) | wrote a python program using pil and pytesseract|
 |   9         | [Setup a Simple Personal Website](https://github.com/pavanbsp/amfoss-tasks/tree/master/TASK-9)  | Designed a simple personal website |

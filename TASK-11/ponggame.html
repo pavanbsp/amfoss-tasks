@@ -1,119 +1,172 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
+<head>
+    <meta charset="utf-8" />
+    <title>THE PONG GAME</title>
     <style>
-      .topPlayer {
-        -moz-transform: rotate(180deg);
-      }
-      .leftPlayer {
-        -moz-transform: rotate(270deg);
-      }
-      .rightPlayer {
-        -moz-transform: rotate(90deg);
-      }
+    	canvas {
+         background: black;
+         display: block;
+         margin: auto;
+       }
     </style>
-  </head>
-  <body>
-    <canvas id="court"></canvas>
-    
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-    
-  var constants = { court: { width: 0, height: 0, adjusted: false }, 
-                    colors: { court: "brown", ball: "black", paddle: "orange" },
-                    paddle: { width: 0, height: 0, delta: 0 },
-                    ball: { radius: 0 },
-                    player: { id: 0 }
-                  };                               
-  var state = { paddles: {},
-                ball: { left: 0, top: 0 },
-                sides: {}
-              };
-  var socket = io.connect('http://localhost'),
-      canvas = document.getElementById("court"),
-      ctx = canvas.getContext('2d');
-  
-  socket.on('environment', function(data) {
-    constants.court.width = data.court.width;
-    constants.court.height = data.court.height;
-    constants.paddle.delta = data.paddle.delta;
-    constants.paddle.width  = data.paddle.width;
-    constants.paddle.height  = data.paddle.height;
-    constants.ball.radius = data.ball.radius;   
-    constants.player.id = data.player.id;    
-  });
-  
-  socket.on('paddles', function(data) {
-    var paddles = data.positions;
-    // Overwrite the server's version of my own paddle position
-    // if I already know where I am so I don't redraw in the old spot.
-    if (state.paddles[constants.player.id])
-      paddles[constants.player.id] = state.paddles[constants.player.id];
-    state.paddles = paddles;
-    state.sides = data.sides;
-    if (!constants.court.adjusted) {
-        constants.court.adjusted = true;
-        if (state.sides.top == constants.player.id)
-            canvas.className = 'topPlayer';
-        else if (state.sides.left == constants.player.id)
-            canvas.className = 'leftPlayer';
-        else if (state.sides.right == constants.player.id)
-            canvas.className = 'rightPlayer';
-    }
-  });
-  
-  socket.on('ball', function (data) {
-    state.ball.left = data.position.left;
-    state.ball.top = data.position.top;
-    drawCanvas();     
-  });
-  
-  var drawCanvas = function() {
-    canvas.width = constants.court.width;
-    canvas.height = constants.court.height;
-    ctx.fillStyle = constants.colors.court;
-    ctx.fillRect(0, 0, constants.court.width, constants.court.height);
-    ctx.fillStyle = constants.colors.paddle;
-    ctx.fillRect((state.paddles[state.sides.bottom] / 100 * constants.court.width) - (constants.paddle.width / 2),
-                 constants.court.height - constants.paddle.height, constants.paddle.width, constants.paddle.height);
-    ctx.fillRect((state.paddles[state.sides.top] / 100 * constants.court.width) - (constants.paddle.width / 2),
-                 0, constants.paddle.width, constants.paddle.height);
-    ctx.fillRect(0, (state.paddles[state.sides.left] / 100 * constants.court.height) - (constants.paddle.height / 2),
-                 constants.paddle.height, constants.paddle.width);
-    ctx.fillRect(constants.court.width - constants.paddle.height,
-                 (state.paddles[state.sides.right] / 100 * constants.court.height) - (constants.paddle.height / 2),
-                 constants.paddle.height, constants.paddle.width);
-    ctx.fillStyle = constants.colors.ball;
-    ctx.beginPath(); 
-    ctx.arc( state.ball.left, state.ball.top, constants.ball.radius, 0, Math.PI * 2 );
+</head>
+<body>
+
+<canvas id="myCanvas" width="1024" height="720"></canvas>
+
+<script>
+  var canvas = document.getElementById("myCanvas");
+  var ctx = canvas.getContext("2d");
+  var x = canvas.width/2;
+  var y = canvas.height-30;
+  var dx = 4;
+  var dy = -4;
+  var ballRadius = 10;
+  // left player paddle
+  var leftPaddleHeight = 100;
+  var leftPaddleWidth = 15;
+  var leftPaddleX = 5;
+  var leftPaddleY = canvas.height / 2 - leftPaddleHeight / 2;
+  // Right player paddle
+  var rightPaddleHeight = 100;
+  var rightPaddleWidth = 15;
+  var rightPaddleX = canvas.width - (rightPaddleWidth + 5);
+  var rightPaddleY = canvas.height / 2 - rightPaddleHeight / 2;
+  // boolean to handle pressed keys since thats much easier
+  var leftUpPressed = false;
+  var leftDownPressed = false;
+  var rightUpPressed = false;
+  var rightDownPressed = false;
+  var leftScore = 0;
+  var rightScore = 0;
+  function keyDownHandler(e) {
+      if(e.keyCode == 87) {
+          leftUpPressed = true;
+      }
+      else if (e.keyCode == 83) {
+          leftDownPressed = true;
+      }
+      if (e.keyCode == 38) {
+        rightUpPressed = true;
+      }
+      else if (e.keyCode == 40) {
+        rightDownPressed = true;
+      }
+  }
+  function keyUpHandler(e) {
+      if (e.keyCode == 87) {
+          leftUpPressed = false;
+      }
+      else if (e.keyCode == 83) {
+          leftDownPressed = false;
+      }
+      if (e.keyCode == 38) {
+        rightUpPressed = false;
+      }
+      else if (e.keyCode == 40) {
+        rightDownPressed = false;
+      }
+  }
+  //the ball is created
+  function drawBall() {
+    ctx.beginPath();
+    ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+    ctx.fillStyle = "white";
     ctx.fill();
-  };
-  var movePaddle = function (delta) {
-    var newLeft = state.paddles[constants.player.id] + delta;
-    if (newLeft >= 100)
-      newLeft = 100;
-    else if (newLeft <= 0)
-      newLeft = 0;
-    if (newLeft != state.paddles[constants.player.id]) {
-      state.paddles[constants.player.id] = newLeft;
-      socket.emit('paddle', {left: state.paddles[constants.player.id] });
-      drawCanvas();
+    ctx.closePath();
+  }
+  //the score board
+  function drawScores() {
+    ctx.font = "80px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText(leftScore, (canvas.width / 2) - 80, 80);
+    ctx.fillText(rightScore, (canvas.width / 2) + 40, 80);
+  }
+  function collisionsWithLeftPaddle() {
+     if ((x - ballRadius) <= 5 + leftPaddleWidth) {
+       if (y > leftPaddleY && y < leftPaddleY + leftPaddleHeight)
+         dx = -dx;
+       else if ((x - ballRadius) <= 0) {
+         rightScore++;
+         //alert("Game Over");
+         x = canvas.width / 2;
+         y = canvas.height / 2;
+         dx = -dx;
+         dy = -dy;
+       }
+     }
+  }
+  function collisionsWithRightPaddle() {
+    if ((x + ballRadius) >= canvas.width - (rightPaddleWidth + 5)) {
+      if (y > rightPaddleY && y < rightPaddleY + rightPaddleHeight)
+        dx = -dx;
+      else if (x + ballRadius >= canvas.width) {
+        leftScore++;
+        //alert("Game Over"); ever though its a infinite score board game lol
+        x = canvas.width / 2;
+        y = canvas.height / 2;
+        dx = -dx;
+        dy = -dy;
+
+      }
     }
-  };
-  window.addEventListener('keydown', function onKeyDown(aEvent) {
-    switch (aEvent.which) {
-      case 37: // Left
-        if (state.sides.top == constants.player.id || state.sides.right == constants.player.id) movePaddle(constants.paddle.delta);
-        else movePaddle(-constants.paddle.delta);
-        break;
-      case 39: // Right
-        if (state.sides.top == constants.player.id || state.sides.right == constants.player.id) movePaddle(-constants.paddle.delta);
-        else movePaddle(constants.paddle.delta);
-        break;
+  }
+  function computeCollisionsWithWallsAndPaddle() {
+    collisionsWithLeftPaddle();
+    collisionsWithRightPaddle();
+    if (((y - ballRadius) <= 0) || ((y + ballRadius) >= canvas.height)) {
+      dy = -dy;
     }
-  }, false);
- 
-    </script>  
-  </body>
+  }
+  function drawLeftPaddle() {
+    ctx.beginPath();
+    ctx.rect(leftPaddleX, leftPaddleY, leftPaddleWidth, leftPaddleHeight);
+    ctx.fillStyle = "white";
+    ctx.fill();
+    ctx.closePath();
+    if (leftDownPressed && leftPaddleY < canvas.height - leftPaddleHeight) {
+      leftPaddleY += 7;
+    }
+    else if (leftUpPressed && leftPaddleY > 0) {
+      leftPaddleY -= 7;
+    }
+  }
+  function drawRightPaddle() {
+    ctx.beginPath();
+    ctx.rect(rightPaddleX, rightPaddleY, rightPaddleWidth, rightPaddleHeight);
+    ctx.fillStyle = "white";
+    ctx.fill();
+    ctx.closePath();
+    if (rightDownPressed && rightPaddleY < canvas.height - rightPaddleHeight) {
+      rightPaddleY += 7;
+    }
+    else if (rightUpPressed && rightPaddleY > 0) {
+      rightPaddleY -= 7;
+    }
+  }
+  function drawScene() {
+    ctx.beginPath();
+    ctx.rect(canvas.width / 2 - 1, 0, 3, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.fill();
+    ctx.closePath();
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawScores();
+    drawScene();
+    drawLeftPaddle();
+    drawRightPaddle();
+    drawBall();
+    computeCollisionsWithWallsAndPaddle();
+    x += dx;
+    y += dy;
+  }
+  setInterval(draw, 10);
+  document.addEventListener("keydown", keyDownHandler, false);
+  document.addEventListener("keyup", keyUpHandler, false);
+</script>
+
+</body>
 </html>
